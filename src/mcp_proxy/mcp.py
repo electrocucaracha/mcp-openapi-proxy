@@ -75,6 +75,34 @@ class Server:
                     for param in operation.parameters
                     if param.required
                 ]
+                if (
+                    hasattr(operation, "request_body")
+                    and operation.request_body
+                    and operation.request_body.required
+                ):
+                    for content in operation.request_body.content:
+                        if content.schema.required:
+                            inputs.extend(
+                                [
+                                    {
+                                        "name": prop.name,
+                                        "type": data_type[
+                                            (
+                                                prop.schema.type.value
+                                                if prop.schema.type.value != "anyOf"
+                                                else prop.schema.schemas[0].type.value
+                                            )
+                                        ],
+                                        "default": (
+                                            " = " + str(prop.schema.default)
+                                            if prop.schema.default
+                                            else ""
+                                        ),
+                                        "title": prop.schema.title,
+                                    }
+                                    for prop in content.schema.properties
+                                ]
+                            )
 
                 # Generate MCP tool function
                 params = ", ".join(
