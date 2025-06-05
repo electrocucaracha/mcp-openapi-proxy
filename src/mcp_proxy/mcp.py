@@ -50,18 +50,6 @@ class Server:
                 func_name = operation.operation_id
                 url_path = f'f"{base_url}{path.url}"'
 
-                # Retrieve the operation inputs
-                inputs = [
-                    {
-                        "name": param.name,
-                        "type": param.schema.type.value,
-                        "default": param.schema.default,
-                        "title": param.schema.title,
-                    }
-                    for param in operation.parameters
-                    if param.required
-                ]
-
                 # OpenAPI 3.0 Data Types mapping (https://swagger.io/docs/specification/v3_0/data-models/data-types/)
                 data_type = {
                     "string": "str",
@@ -72,16 +60,32 @@ class Server:
                     "array": "list",
                 }
 
+                # Retrieve the operation inputs
+                inputs = [
+                    {
+                        "name": param.name,
+                        "type": data_type[param.schema.type.value],
+                        "default": (
+                            " = " + str(param.schema.default)
+                            if param.schema.default
+                            else ""
+                        ),
+                        "title": param.schema.title,
+                    }
+                    for param in operation.parameters
+                    if param.required
+                ]
+
                 # Generate MCP tool function
                 params = ", ".join(
                     [
-                        f"{input['name']}: {data_type[input['type']]}{' = ' + input['default'] if input['default'] else ''}"
+                        f"{input['name']}: {input['type']}{input['default']}"
                         for input in inputs
                     ]
                 )
                 params_docstring = "\n".join(
                     [
-                        f"{input['name']} ({data_type[input['type']]}): {input['title']}"
+                        f"        {input['name']} ({input['type']}): {input['title']}"
                         for input in inputs
                     ]
                 )
@@ -93,7 +97,7 @@ class Server:
     {operation.summary}
 
     Parameters:
-        {params_docstring}
+{params_docstring}
 
     Returns:
         dict
