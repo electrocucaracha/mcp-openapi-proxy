@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Module the provides a starting point for the application."""
+
 import asyncio
 
 import click
@@ -55,6 +57,19 @@ from mcp_proxy.mcp import Server
 def cli(
     openapi_spec_url: str, transport: str, host: str, port: int, skip_tool: list
 ) -> None:
+    """
+    This method creates MCP server using the OpenAPI spec provided
+
+    Parameters:
+        openapi_spec_url (str): Open API URL.
+        transport (str): MCP Transport type.
+        host (str): Server bind host.
+        port (int): Server port number.
+        skip_tool (list): List of Operation IDs to be skipped in the registry.
+
+    Returns:
+        None
+    """
     server = Server(
         url=openapi_spec_url,
         name="OpenAPI MCP proxy",
