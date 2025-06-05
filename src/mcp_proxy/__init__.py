@@ -25,6 +25,7 @@ from mcp_proxy.mcp import Server
     "--openapi-spec-url",
     help="Open API URL. (Default env variable OPENAPI_SPEC_URL)",
     envvar="OPENAPI_SPEC_URL",
+    required=True,
 )
 @click.option(
     "--transport",
