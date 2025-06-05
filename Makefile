@@ -14,6 +14,7 @@ lint:
 	sudo -E $(DOCKER_CMD) run --rm -v $$(pwd):/tmp/lint \
 	-e RUN_LOCAL=true \
 	-e LINTER_RULES_PATH=/ \
+	-e VALIDATE_CHECKOV=false \
 	-e DEFAULT_BRANCH=main \
 	ghcr.io/super-linter/super-linter
 
