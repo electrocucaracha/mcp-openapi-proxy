@@ -47,8 +47,19 @@ from mcp_proxy.mcp import Server
     envvar="PORT",
     default=8000,
 )
-def cli(openapi_spec_url: str, transport: str, host: str, port: int) -> None:
+@click.option(
+    "--skip-tool",
+    help="Skipped Operation ID to be registered as MCP tool",
+    multiple=True,
+)
+def cli(
+    openapi_spec_url: str, transport: str, host: str, port: int, skip_tool: list
+) -> None:
     server = Server(
-        url=openapi_spec_url, name="OpenAPI MCP proxy", host=host, port=port
+        url=openapi_spec_url,
+        name="OpenAPI MCP proxy",
+        host=host,
+        port=port,
+        skip_tool=skip_tool,
     )
     asyncio.run(server.mcp.run(transport=transport))

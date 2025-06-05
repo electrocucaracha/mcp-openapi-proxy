@@ -26,7 +26,14 @@ logger = logging.getLogger()
 
 
 class Server:
-    def __init__(self, url: str, name: str, host: str = "127.0.0.1", port: int = 8000):
+    def __init__(
+        self,
+        url: str,
+        name: str,
+        host: str = "127.0.0.1",
+        port: int = 8000,
+        skip_tool: list = [],
+    ):
         self.mcp = FastMCP(name=name, host=host, port=port)
 
         parsed_url = urlparse(url)
@@ -37,6 +44,8 @@ class Server:
 
         for path in openapi_spec.paths:
             for operation in path.operations:
+                if operation.operation_id in skip_tool:
+                    continue
                 func_name = operation.operation_id
                 url_path = f'f"{base_url}{path.url}"'
 
