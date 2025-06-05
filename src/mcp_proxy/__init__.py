@@ -14,7 +14,6 @@
 # limitations under the License.
 
 import asyncio
-import os
 
 import click
 
@@ -25,23 +24,26 @@ from mcp_proxy.mcp import Server
 @click.option(
     "--openapi-spec-url",
     help="Open API URL. (Default env variable OPENAPI_SPEC_URL)",
-    default=os.environ.get("OPENAPI_SPEC_URL", ""),
+    envvar="OPENAPI_SPEC_URL",
 )
 @click.option(
     "--transport",
     help="Transport type",
     type=click.Choice(["stdio", "sse", "streamable-http"]),
+    envvar="TRANSPORT",
     default="streamable-http",
 )
 @click.option(
     "--host",
     help="Server bind host",
+    envvar="HOST",
     default="127.0.0.1",
 )
 @click.option(
     "--port",
     help="Server port number",
     type=click.IntRange(1024, 49151),
+    envvar="PORT",
     default=8000,
 )
 def cli(openapi_spec_url: str, transport: str, host: str, port: int) -> None:

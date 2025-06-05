@@ -47,9 +47,9 @@ sequenceDiagram
     openapi_server->>db: Query database
     db-->>openapi_server: Database response
     openapi_server-->> user: OpenAPI Server response
-    
+
     Note over user,db: LLM interaction
-    
+
     user->>agent: Send a prompt
     agent->>ingress: Request for MCP tool
     ingress->>mcp_proxy: Forward request
@@ -60,3 +60,12 @@ sequenceDiagram
     mcp_proxy-->>agent: MCP server response
     agent-->>user: Prompt response
 ```
+
+## Environment variables
+
+| Name             | Default         | Description                                                  |
+| ---------------- | --------------- | ------------------------------------------------------------ |
+| OPENAPI_SPEC_URL |                 | URL of the Open API specification.                           |
+| TRANSPORT        | streamable-http | Transport type to use for communication with the MCP server. |
+| HOST             | 127.0.0.1       | Hostname or IP address to bind the server to.                |
+| PORT             | 8000            | Port number to listen on.                                    |

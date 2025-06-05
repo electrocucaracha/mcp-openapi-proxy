@@ -9,6 +9,8 @@ RUN uv sync --frozen --no-cache
 EXPOSE 8000
 
 ENV OPENAPI_SPEC_URL=http://localhost:8080/openapi.json
+ENV TRANSPORT=streamable-http
+ENV HOST=0.0.0.0
+ENV PORT=8000
 
 ENTRYPOINT ["/app/.venv/bin/mcp-proxy"]
-CMD ["--transport", "streamable-http", "--host", "0.0.0.0", "--port", "8000"]

@@ -2,6 +2,7 @@ boyter
 brightgreen
 COCOMO
 electrocucaracha
+Hostname
 href
 https
 img
@@ -17,5 +18,6 @@ Scc
 sequenceDiagram
 sloc
 src
+streamable
 svg
 xyz
