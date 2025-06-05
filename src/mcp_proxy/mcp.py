@@ -56,6 +56,7 @@ class Server:
                         "name": param.name,
                         "type": param.schema.type.value,
                         "default": param.schema.default,
+                        "title": param.schema.title,
                     }
                     for param in operation.parameters
                     if param.required
@@ -78,10 +79,25 @@ class Server:
                         for input in inputs
                     ]
                 )
+                params_docstring = "\n".join(
+                    [
+                        f"{input['name']} ({data_type[input['type']]}): {input['title']}"
+                        for input in inputs
+                    ]
+                )
                 data_template = "{%s}" % ", ".join(
                     [f"'{input['name']}': {input['name']}" for input in inputs]
                 )
                 func_template = f"""def {func_name}({params}) -> dict:
+    '''
+    {operation.summary}
+
+    Parameters:
+        {params_docstring}
+
+    Returns:
+        dict
+    '''
     import requests
 
     data={data_template}
