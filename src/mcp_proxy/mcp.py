@@ -15,11 +15,14 @@
 
 """Module providing MCP server basing on OpenAPI specification."""
 
+import logging
 from types import FunctionType
 from urllib.parse import urlparse
 
 from mcp.server.fastmcp import FastMCP
 from openapi_parser import parse
+
+logger = logging.getLogger()
 
 
 class Server:
@@ -27,8 +30,10 @@ class Server:
         self.mcp = FastMCP(name=name, host=host, port=port)
 
         parsed_url = urlparse(url)
-        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
         openapi_spec = parse(url)
+        base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+        if len(openapi_spec.servers) > 0:
+            base_url = openapi_spec.servers[0].url
 
         for path in openapi_spec.paths:
             for operation in path.operations:
@@ -37,29 +42,53 @@ class Server:
 
                 # Retrieve the operation inputs
                 inputs = [
-                    param.name for param in operation.parameters if param.required
+                    {
+                        "name": param.name,
+                        "type": param.schema.type.value,
+                        "default": param.schema.default,
+                    }
+                    for param in operation.parameters
+                    if param.required
                 ]
-                if operation.request_body and operation.request_body.required:
-                    for content in operation.request_body.content:
-                        for prop in content.schema.properties:
-                            inputs.append(prop.name)
+
+                # OpenAPI 3.0 Data Types mapping (https://swagger.io/docs/specification/v3_0/data-models/data-types/)
+                data_type = {
+                    "string": "str",
+                    "integer": "int",
+                    "number": "float",
+                    "boolean": "bool",
+                    "object": "dict",
+                    "array": "list",
+                }
 
                 # Generate MCP tool function
-                data_template = "{%s}" % ", ".join(
-                    [f"'{input}': {input}" for input in inputs]
+                params = ", ".join(
+                    [
+                        f"{input['name']}: {data_type[input['type']]}{' = ' + input['default'] if input['default'] else ''}"
+                        for input in inputs
+                    ]
                 )
-                func_template = f"""def {func_name}({", ".join(inputs)}):
-                    import requests
-                    data={data_template}
-                    response = requests.request('{operation.method.name}', {url_path}, json=data)
-                    return response.json()
+                data_template = "{%s}" % ", ".join(
+                    [f"'{input['name']}': {input['name']}" for input in inputs]
+                )
+                func_template = f"""def {func_name}({params}) -> dict:
+    import requests
+
+    data={data_template}
+    response = requests.request('{operation.method.name}', {url_path}, json=data)
+
+    return response.json()
                 """
                 new_func = compile(func_template, "<string>", "exec")
-                mcp_func = FunctionType(new_func.co_consts[0], globals(), func_name)
+                for co_consts in new_func.co_consts:
+                    if hasattr(co_consts, "co_name") and co_consts.co_name == func_name:
+                        mcp_func = FunctionType(co_consts, globals(), func_name)
 
-                # Register MCP tool function
-                self.mcp.add_tool(
-                    fn=mcp_func,
-                    name=func_name,
-                    description=operation.summary,
-                )
+                        # Register MCP tool function
+                        self.mcp.add_tool(
+                            fn=mcp_func,
+                            name=func_name,
+                            description=operation.summary,
+                        )
+                        logger.info(f"{func_name} MCP tool registered")
+                        break
