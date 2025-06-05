@@ -26,6 +26,7 @@ logger = logging.getLogger()
 
 
 class Server:
+
     def __init__(
         self,
         url: str,
