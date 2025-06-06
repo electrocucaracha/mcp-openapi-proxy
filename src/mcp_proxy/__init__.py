@@ -72,9 +72,8 @@ def cli(
     """
     server = Server(
         url=openapi_spec_url,
-        name="OpenAPI MCP proxy",
         host=host,
         port=port,
         skip_tool=skip_tool,
     )
-    asyncio.run(server.mcp.run(transport=transport))
+    asyncio.run(server.run(transport=transport))
