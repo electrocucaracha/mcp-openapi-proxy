@@ -21,19 +21,21 @@ from urllib.parse import urlparse
 
 from mcp.server.fastmcp import FastMCP
 from openapi_parser import parse
-from openapi_parser.specification import Operation
+from openapi_parser.enumeration import DataType
+from openapi_parser.specification import AnyOf, Operation, Schema
 
 logger = logging.getLogger()
 
 # OpenAPI 3.0 Data Types mapping
 # (https://swagger.io/docs/specification/v3_0/data-models/data-types/)
 data_type = {
-    "string": "str",
-    "integer": "int",
-    "number": "float",
-    "boolean": "bool",
-    "object": "dict",
-    "array": "list",
+    DataType.STRING: "str",
+    DataType.INTEGER: "int",
+    DataType.NUMBER: "float",
+    DataType.BOOLEAN: "bool",
+    DataType.OBJECT: "dict",
+    DataType.ARRAY: "list",
+    DataType.NULL: "None",
 }
 
 
@@ -42,24 +44,27 @@ def _get_function_template(url_path: str, operation: Operation) -> str:
     func_name = operation.operation_id
 
     params = ", ".join(
-        [f"{input['name']}: {input['type']}{input['default']}" for input in inputs]
+        [f"{input.name}: {input.type}{input.default}" for input in inputs]
     )
     params_docstring = ""
     if len(inputs) > 0:
-        params_docstring = "\n    Parameters:\n" + "\n".join(
-            [
-                f"        {input['name']} ({input['type']}): {input['title']}"
-                for input in inputs
-            ]
+        params_docstring = (
+            "\n    Parameters:\n"
+            + "\n".join(
+                [
+                    f"        {input.name} ({input.type}): {input.title}"
+                    for input in inputs
+                ]
+            )
+            + "\n"
         )
     data_template = "{%s}" % ", ".join(
-        [f"'{input['name']}': {input['name']}" for input in inputs]
+        [f"'{input.name}': {input.name}" for input in inputs]
     )
     return f"""def {func_name}({params}) -> dict:
     '''
     {operation.summary}
     {params_docstring}
-
     Returns:
         dict
     '''
@@ -72,18 +77,49 @@ def _get_function_template(url_path: str, operation: Operation) -> str:
     """
 
 
-def _get_inputs(operation: Operation) -> list:
+class Input:
+
+    def __init__(self, name: str, schema: Schema, required: bool = True):
+        self._name = name
+        if isinstance(schema, AnyOf):
+            self._type = "|".join(
+                [self._get_type(s.type, required) for s in schema.schemas]
+            )
+        else:
+            self._type = self._get_type(schema.type, required)
+        self._default = schema.default
+        self._title = schema.title
+
+    def _get_type(self, type: DataType, required: bool = True) -> str:
+        return (
+            data_type.get(type, "") if required else "%s|None" % data_type.get(type, "")
+        )
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def type(self) -> str:
+        return self._type
+
+    @property
+    def title(self) -> str:
+        return self._title
+
+    @property
+    def default(self) -> str:
+        if self._default is not None:
+            if str(self._default) == "":
+                return " = ''"
+            return " = %s" % self._default
+        return ""
+
+
+def _get_inputs(operation: Operation) -> list[Input]:
     inputs = [
-        {
-            "name": param.name,
-            "type": data_type[param.schema.type.value],
-            "default": (
-                " = " + str(param.schema.default) if param.schema.default else ""
-            ),
-            "title": param.schema.title,
-        }
+        Input(param.name, param.schema, param.required)
         for param in operation.parameters
-        if param.required
     ]
     if (
         hasattr(operation, "request_body")
@@ -94,22 +130,7 @@ def _get_inputs(operation: Operation) -> list:
             if content.schema.required:
                 inputs.extend(
                     [
-                        {
-                            "name": prop.name,
-                            "type": data_type[
-                                (
-                                    prop.schema.type.value
-                                    if prop.schema.type.value != "anyOf"
-                                    else prop.schema.schemas[0].type.value
-                                )
-                            ],
-                            "default": (
-                                " = " + str(prop.schema.default)
-                                if prop.schema.default
-                                else ""
-                            ),
-                            "title": prop.schema.title,
-                        }
+                        Input(prop.name, prop.schema)
                         for prop in content.schema.properties
                     ]
                 )
