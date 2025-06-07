@@ -36,6 +36,13 @@ data_type = {
 
 
 def get_function_template(url_path: str, operation: Operation) -> str:
+    """
+    Get the python function definition for the MCP tool.
+
+    Returns:
+        str
+    """
+
     inputs = _get_inputs(operation)
     func_name = operation.operation_id
 
@@ -74,6 +81,10 @@ def get_function_template(url_path: str, operation: Operation) -> str:
 
 
 class Input:
+    """
+    This class convers OpenAPI paramaters in Python inputs.
+    """
+
     def __init__(self, name: str, schema: Schema, required: bool = True):
         self._name = name
         if isinstance(schema, AnyOf):
@@ -85,29 +96,53 @@ class Input:
         self._default = schema.default
         self._title = schema.title
 
-    def _get_type(self, type: DataType, required: bool = True) -> str:
-        return (
-            data_type.get(type, "") if required else "%s|None" % data_type.get(type, "")
-        )
+    def _get_type(self, _type: DataType, required: bool = True) -> str:
+        if _type in data_type:
+            return data_type[_type] if required else f"{data_type[_type]}|None"
+        return ""
 
     @property
     def name(self) -> str:
+        """
+        Get name of the input.
+
+        Returns:
+            str
+        """
         return self._name
 
     @property
     def type(self) -> str:
+        """
+        Get type of the input.
+
+        Returns:
+            str
+        """
         return self._type
 
     @property
     def title(self) -> str:
+        """
+        Get title of the input.
+
+        Returns:
+            str
+        """
         return self._title
 
     @property
     def default(self) -> str:
+        """
+        Get default value of the input.
+
+        Returns:
+            str
+        """
         if self._default is not None:
             if str(self._default) == "":
                 return " = ''"
-            return " = %s" % self._default
+            return f" = {self._default}"
         return ""
 
 
