@@ -85,14 +85,12 @@ class Input:
     This class convers OpenAPI paramaters in Python inputs.
     """
 
-    def __init__(self, name: str, schema: Schema, required: bool = True):
+    def __init__(self, name: str, schema: Schema):
         self._name = name
         if isinstance(schema, AnyOf):
-            self._type = "|".join(
-                [self._get_type(s.type, required) for s in schema.schemas]
-            )
+            self._type = "|".join([self._get_type(s.type) for s in schema.schemas])
         else:
-            self._type = self._get_type(schema.type, required)
+            self._type = self._get_type(schema.type)
         self._default = schema.default
         self._title = schema.title
 
@@ -148,8 +146,9 @@ class Input:
 
 def _get_inputs(operation: Operation) -> list[Input]:
     inputs = [
-        Input(param.name, param.schema, param.required)
+        Input(param.name, param.schema)
         for param in operation.parameters
+        if param.required
     ]
     if (
         hasattr(operation, "request_body")
