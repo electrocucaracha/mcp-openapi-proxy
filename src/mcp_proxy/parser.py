@@ -64,7 +64,8 @@ def get_function_template(url_path: str, operation: Operation) -> str:
     data_template = "{%s}" % ", ".join(
         [f"'{input.name}': {input.name}" for input in inputs]
     )
-    return f"""def {func_name}({params}) -> dict:
+    return f"""@self._mcp.tool()
+def {func_name}({params}) -> dict:
     '''
     {operation.summary}
     {params_docstring}

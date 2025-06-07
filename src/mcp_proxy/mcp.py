@@ -16,7 +16,6 @@
 """Module providing MCP server basing on OpenAPI specification."""
 
 import logging
-from types import FunctionType
 from urllib.parse import urlparse
 
 from mcp.server.fastmcp import FastMCP
@@ -51,23 +50,11 @@ class Server:
             for operation in path.operations:
                 if skip_tool and operation.operation_id in skip_tool:
                     continue
-                func_name = operation.operation_id
                 func_template = get_function_template(
                     f'f"{base_url}{path.url}"', operation
                 )
                 new_func = compile(func_template, "<string>", "exec")
-                for co_consts in new_func.co_consts:
-                    if hasattr(co_consts, "co_name") and co_consts.co_name == func_name:
-                        mcp_func = FunctionType(co_consts, globals(), func_name)
-
-                        # Register MCP tool function
-                        self._mcp.add_tool(
-                            fn=mcp_func,
-                            name=func_name,
-                            description=operation.summary,
-                        )
-                        logger.info("%s MCP tool registered", func_name)
-                        break
+                exec(new_func)  # pylint: disable=exec-used
 
     @property
     def mcp(self) -> FastMCP:
