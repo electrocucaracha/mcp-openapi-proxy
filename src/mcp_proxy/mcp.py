@@ -44,21 +44,21 @@ def _get_function_template(url_path: str, operation: Operation) -> str:
     params = ", ".join(
         [f"{input['name']}: {input['type']}{input['default']}" for input in inputs]
     )
-    params_docstring = "\n".join(
-        [
-            f"        {input['name']} ({input['type']}): {input['title']}"
-            for input in inputs
-        ]
-    )
+    params_docstring = ""
+    if len(inputs) > 0:
+        params_docstring = "\n    Parameters:\n" + "\n".join(
+            [
+                f"        {input['name']} ({input['type']}): {input['title']}"
+                for input in inputs
+            ]
+        )
     data_template = "{%s}" % ", ".join(
         [f"'{input['name']}': {input['name']}" for input in inputs]
     )
     return f"""def {func_name}({params}) -> dict:
     '''
     {operation.summary}
-
-    Parameters:
-{params_docstring}
+    {params_docstring}
 
     Returns:
         dict
