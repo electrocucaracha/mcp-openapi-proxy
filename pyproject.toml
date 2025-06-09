@@ -27,3 +27,69 @@ profile = "black"
 test = [
     "pytest",
 ]
+
+[dependency-groups]
+tests = [
+    "pytest",
+]
+spell = [
+    "pyspelling",
+]
+fmt = [
+    "black",
+    "isort",
+    "pyink",
+    "ruff",
+]
+
+[tool.tox]
+env_list = ["3.12"]
+
+[tool.tox.env_run_base]
+description = "Run unit test under {base_python}"
+dependency_groups = [
+    "tests",
+]
+commands = [
+    [
+        "pytest",
+        "tests/",
+    ]
+]
+
+[tool.tox.env.spell]
+description = "Check spelling in the codebase"
+dependency_groups = [
+    "spell",
+]
+commands = [
+    [
+        "pyspelling",
+        "-c",
+        ".spellcheck.yml",
+    ],
+]
+
+[tool.tox.env.fmt]
+description = "Format the codebase"
+dependency_groups = [
+    "fmt",
+]
+commands = [
+    [
+        "black",
+        ".",
+    ],
+    [
+        "isort",
+        ".",
+    ],
+    [
+        "pyink",
+        ".",
+    ],
+    [
+        "ruff",
+        "format",
+    ],
+]
