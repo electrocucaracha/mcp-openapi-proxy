@@ -9,8 +9,13 @@
 
 DOCKER_CMD ?= $(shell which docker 2> /dev/null || which podman 2> /dev/null || echo docker)
 
+.PHONY: cleanup
+cleanup:
+	sudo rm -rf node_modules
+	rm -rf .tox/ .venv/
+
 .PHONY: lint
-lint:
+lint: cleanup
 	sudo -E $(DOCKER_CMD) run --rm -v $$(pwd):/tmp/lint \
 	-e RUN_LOCAL=true \
 	-e LINTER_RULES_PATH=/ \
@@ -19,8 +24,7 @@ lint:
 	ghcr.io/super-linter/super-linter
 
 .PHONY: fmt
-fmt:
-	sudo rm -rf node_modules
+fmt: cleanup
 	command -v shfmt > /dev/null || curl -s "https://i.jpillora.com/mvdan/sh!!?as=shfmt" | bash
 	shfmt -l -w -s .
 	command -v yamlfmt > /dev/null || curl -s "https://i.jpillora.com/google/yamlfmt!!" | bash
