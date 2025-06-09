@@ -22,3 +22,8 @@ packages = ["src/mcp_proxy"]
 
 [tool.isort]
 profile = "black"
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]

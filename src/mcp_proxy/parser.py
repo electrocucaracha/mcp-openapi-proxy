@@ -68,7 +68,7 @@ def get_function_template(url_path: str, operation: Operation) -> str:
 def {func_name}({params}) -> dict:
     '''
     {operation.summary}
-    {params_docstring}
+{params_docstring}
     Returns:
         dict
     '''
