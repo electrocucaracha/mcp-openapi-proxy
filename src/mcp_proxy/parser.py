@@ -44,6 +44,7 @@ def get_function_template(url_path: str, operation: Operation) -> str:
     """
 
     inputs = _get_inputs(operation)
+    output = _get_output(operation)
     func_name = operation.operation_id
 
     params = ", ".join(
@@ -65,12 +66,12 @@ def get_function_template(url_path: str, operation: Operation) -> str:
         [f"'{input.name}': {input.name}" for input in inputs]
     )
     return f"""@self._mcp.tool()
-def {func_name}({params}) -> dict:
+def {func_name}({params}) -> {output}:
     '''
     {operation.summary}
 {params_docstring}
     Returns:
-        dict
+        {output}
     '''
     import requests
 
@@ -89,16 +90,11 @@ class Input:
     def __init__(self, name: str, schema: Schema):
         self._name = name
         if isinstance(schema, AnyOf):
-            self._type = "|".join([self._get_type(s.type) for s in schema.schemas])
+            self._type = "|".join([_get_type(s.type) for s in schema.schemas])
         else:
-            self._type = self._get_type(schema.type)
+            self._type = _get_type(schema.type)
         self._default = schema.default
         self._title = schema.title
-
-    def _get_type(self, _type: DataType, required: bool = True) -> str:
-        if _type in data_type:
-            return data_type[_type] if required else f"{data_type[_type]}|None"
-        return ""
 
     @property
     def name(self) -> str:
@@ -145,6 +141,12 @@ class Input:
         return ""
 
 
+def _get_type(_type: DataType, required: bool = True) -> str:
+    if _type in data_type:
+        return data_type[_type] if required else f"{data_type[_type]}|None"
+    return ""
+
+
 def _get_inputs(operation: Operation) -> list[Input]:
     inputs = [
         Input(param.name, param.schema)
@@ -165,3 +167,15 @@ def _get_inputs(operation: Operation) -> list[Input]:
                     ]
                 )
     return inputs
+
+
+def _get_output(operation: Operation) -> str:
+    types = []
+    for resp in operation.responses:
+        for cont in resp.content:
+            if isinstance(cont.schema, AnyOf):
+                types.extend([_get_type(s.type) for s in cont.schema.schemas])
+            else:
+                types.append(_get_type(cont.schema.type))
+
+    return "|".join(sorted(set(types)))
