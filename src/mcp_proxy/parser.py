@@ -172,10 +172,11 @@ def _get_inputs(operation: Operation) -> list[Input]:
 def _get_output(operation: Operation) -> str:
     types = []
     for resp in operation.responses:
-        for cont in resp.content:
-            if isinstance(cont.schema, AnyOf):
-                types.extend([_get_type(s.type) for s in cont.schema.schemas])
-            else:
-                types.append(_get_type(cont.schema.type))
+        if resp.code == 200:
+            for cont in resp.content:
+                if isinstance(cont.schema, AnyOf):
+                    types.extend([_get_type(s.type) for s in cont.schema.schemas])
+                else:
+                    types.append(_get_type(cont.schema.type))
 
     return "|".join(sorted(set(types)))

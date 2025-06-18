@@ -26,7 +26,7 @@ def get_upsert_summary_summaries__post_tool():
     """Fixture for the get upsert_summary_summaries__post function as string."""
 
     return """@self._mcp.tool()
-def upsert_summary_summaries__post(id: int|None, url: str, content: str = '') -> dict|int:
+def upsert_summary_summaries__post(id: int|None, url: str, content: str = '') -> int:
     '''
     Upsert Summary
 
@@ -36,7 +36,7 @@ def upsert_summary_summaries__post(id: int|None, url: str, content: str = '') ->
         content (str): Content
 
     Returns:
-        dict|int
+        int
     '''
     import requests
 
@@ -52,12 +52,12 @@ def get_read_summaries_summaries__get_tool():
     """Fixture for the get read_summaries_summaries__get function as string."""
 
     return """@self._mcp.tool()
-def read_summaries_summaries__get() -> dict|list:
+def read_summaries_summaries__get() -> list:
     '''
     Read Summaries
 
     Returns:
-        dict|list
+        list
     '''
     import requests
 
