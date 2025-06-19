@@ -65,7 +65,7 @@ def get_function_template(url_path: str, operation: Operation) -> str:
     data_template = "{%s}" % ", ".join(
         [f"'{input.name}': {input.name}" for input in inputs]
     )
-    return f"""@self._mcp.tool()
+    return f"""@self._mcp.tool(name='{operation.operation_id}', description='{operation.summary}')
 def {func_name}({params}) -> {output}:
     '''
     {operation.summary}

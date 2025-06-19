@@ -25,7 +25,7 @@ from mcp_proxy.parser import get_function_template
 def get_upsert_summary_summaries__post_tool():
     """Fixture for the get upsert_summary_summaries__post function as string."""
 
-    return """@self._mcp.tool()
+    return """@self._mcp.tool(name='upsert_summary_summaries__post', description='Upsert Summary')
 def upsert_summary_summaries__post(id: int|None, url: str, content: str = '') -> int:
     '''
     Upsert Summary
@@ -51,7 +51,7 @@ def upsert_summary_summaries__post(id: int|None, url: str, content: str = '') ->
 def get_read_summaries_summaries__get_tool():
     """Fixture for the get read_summaries_summaries__get function as string."""
 
-    return """@self._mcp.tool()
+    return """@self._mcp.tool(name='read_summaries_summaries__get', description='Read Summaries')
 def read_summaries_summaries__get() -> list:
     '''
     Read Summaries
@@ -72,7 +72,7 @@ def read_summaries_summaries__get() -> list:
 def get_read_summary_summaries__id__get_tool():
     """Fixture for the get read_summary_summaries__id__get function as string."""
 
-    return """@self._mcp.tool()
+    return """@self._mcp.tool(name='read_summary_summaries__id__get', description='Read Summary')
 def read_summary_summaries__id__get(id: int) -> dict:
     '''
     Read Summary
