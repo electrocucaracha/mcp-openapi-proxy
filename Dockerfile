@@ -14,11 +14,11 @@ COPY . /app/
 
 # Sync the project
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --locked --no-editable
+    uv sync --locked --no-editable && uvx pex -o mcp-proxy -c mcp-proxy --sh-boot --include-tools .
 
 FROM python:3.12-slim
 
-COPY --from=builder --chown=app:app /app/.venv /app/.venv
+COPY --from=builder /app/mcp-proxy /opt/mcp-proxy
 
 EXPOSE 8000
 
@@ -26,5 +26,6 @@ ENV OPENAPI_SPEC_URL=http://localhost:8080/openapi.json
 ENV TRANSPORT=streamable-http
 ENV HOST=0.0.0.0
 ENV PORT=8000
+ENV PEX_TOOLS=1
 
-ENTRYPOINT ["/app/.venv/bin/mcp-proxy"]
+ENTRYPOINT ["/opt/mcp-proxy"]
