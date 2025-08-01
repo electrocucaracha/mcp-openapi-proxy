@@ -45,3 +45,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CHECKOV: false
           LINTER_RULES_PATH: /
+          DEFAULT_BRANCH: ${{ github.head_ref || github.ref_name }}
