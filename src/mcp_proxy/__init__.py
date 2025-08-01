@@ -18,8 +18,11 @@
 import asyncio
 
 import click
+import uvloop
 
 from mcp_proxy.mcp import Server
+
+asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 
 @click.command()
@@ -76,4 +79,5 @@ def cli(
         port=port,
         skip_tool=skip_tool,
     )
-    asyncio.run(server.run(transport=transport))
+    with asyncio.Runner(loop_factory=uvloop.new_event_loop) as runner:
+        runner.run(server.run(transport=transport))

@@ -8,6 +8,7 @@ dependencies = [
     "asyncclick",
     "click",
     "openapi3-parser",
+    "uvloop",
 ]
 
 [build-system]
