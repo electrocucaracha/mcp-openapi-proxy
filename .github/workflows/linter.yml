@@ -45,4 +45,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_CHECKOV: false
           LINTER_RULES_PATH: /
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch || 'main'}}
+          DEFAULT_BRANCH: ${{ github.event.pull_request.base.ref || github.event.push.ref }}
