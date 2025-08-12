@@ -69,3 +69,48 @@ sequenceDiagram
 | TRANSPORT        | streamable-http | Transport type to use for communication with the MCP server. |
 | HOST             | 127.0.0.1       | Hostname or IP address to bind the server to.                |
 | PORT             | 8000            | Port number to listen on.                                    |
+
+## Validation
+
+A [helper script](tests/client.py) is provided to validate the MCP server.
+It uses the MCP Python SDK to connect, list tools, and execute them.
+
+### List available tools
+
+```bash
+uv run tests/client.py -m http://localhost:8000/mcp
+```
+
+Example output:
+
+```json
+{
+  "properties": {
+    "url": {
+      "title": "Url",
+      "type": "string"
+    }
+  },
+  "required": ["url"],
+  "title": "fetch_websiteArguments",
+  "type": "object"
+}
+```
+
+### Call a tool
+
+```bash
+uv run tests/client.py -m http://localhost:8000/mcp -a call-tool -t fetch -i url=https://electrocucaracha.com/acerca/
+```
+
+Example output (truncated):
+
+```html
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    ...
+  </head>
+</html>
+```
