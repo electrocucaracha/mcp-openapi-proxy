@@ -78,7 +78,7 @@ It uses the MCP Python SDK to connect, list tools, and execute them.
 ### List available tools
 
 ```bash
-uv run tests/client.py -m http://localhost:8000/mcp
+./tests/client.py -m http://localhost:8000/mcp
 ```
 
 Example output:
@@ -100,7 +100,7 @@ Example output:
 ### Call a tool
 
 ```bash
-uv run tests/client.py -m http://localhost:8000/mcp -a call-tool -t fetch -i url=https://electrocucaracha.com/acerca/
+./tests/client.py -m http://localhost:8000/mcp -a call-tool -t fetch -i url=https://electrocucaracha.com/acerca/
 ```
 
 Example output (truncated):
