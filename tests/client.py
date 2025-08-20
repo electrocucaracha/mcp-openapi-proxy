@@ -25,7 +25,7 @@
 # ///
 import asyncio
 import json
-from typing import Any, Mapping
+from typing import Any, Callable
 
 import asyncclick as click
 from anyio.streams.memory import MemoryObjectReceiveStream, MemoryObjectSendStream
@@ -36,10 +36,10 @@ from mcp.client.streamable_http import streamablehttp_client
 
 def _headers_to_dict(
     _: click.Context, __: click.Option, attributes: tuple[str, ...]
-) -> Mapping[str, str | int]:
+) -> dict[str, int | str]:
     """Click callback that converts headers specified in the form `key=value` to a
     dictionary"""
-    result = {}
+    result: dict[str, int | str] = {}
     for arg in attributes:
         k, v = arg.split("=")
         if k in result:
@@ -52,6 +52,7 @@ def _headers_to_dict(
     return result
 
 
+# pylint: disable = unused-argument
 async def _print_tools(
     read: MemoryObjectReceiveStream, write: MemoryObjectSendStream, **kwargs
 ) -> None:
@@ -82,7 +83,7 @@ async def _call_tool(
             print(result)
 
 
-actions = {"print-tools": _print_tools, "call-tool": _call_tool}
+actions: dict[str, Callable] = {"print-tools": _print_tools, "call-tool": _call_tool}
 
 
 @click.command()
@@ -129,4 +130,5 @@ async def cli(
 
 
 if __name__ == "__main__":
+    # pylint: disable = no-value-for-parameter
     asyncio.run(cli())
