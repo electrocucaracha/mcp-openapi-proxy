@@ -5,6 +5,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![GitHub Super-Linter](https://github.com/electrocucaracha/mcp-openapi-proxy/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
 [![Ruby Style Guide](https://img.shields.io/badge/code_style-rubocop-brightgreen.svg)](https://github.com/rubocop/rubocop)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <!-- markdown-link-check-disable-next-line -->
 
@@ -25,8 +26,6 @@ It parses an OpenAPI specification and dynamically generates the corresponding M
 
 One common use case is deploying this application as a sidecar alongside existing services.
 This enables seamless MCP support without requiring manual server implementation.
-
-## Why MCP OpenAPI Proxy?
 
 By automating the translation from OpenAPI to MCP, this tool reduces the overhead of manual server development
 and promotes faster adoption of the MCP protocol within modern service architectures.
