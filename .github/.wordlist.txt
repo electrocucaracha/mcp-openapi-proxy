@@ -18,6 +18,7 @@ MCP
 OpenAPI
 opensource
 pre
+psf
 py
 rubocop
 Scc
