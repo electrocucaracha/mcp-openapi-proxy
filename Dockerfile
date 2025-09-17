@@ -1,3 +1,4 @@
+#checkov:skip=CKV_DOCKER_2:Ensure that HEALTHCHECK instructions have been added to container images
 FROM python:3.12-slim AS builder
 
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -19,5 +20,8 @@ ENV TRANSPORT=streamable-http
 ENV HOST=0.0.0.0
 ENV PORT=8000
 ENV PEX_TOOLS=1
+
+RUN useradd -m proxy-user
+USER proxy-user
 
 ENTRYPOINT ["/opt/mcp-proxy"]

@@ -13,15 +13,17 @@ on:
   schedule:
     - cron: "0 0 * * 5"
   workflow_dispatch:
-permissions:
-  contents: write # for technote-space/create-pr-action to push code
-  pull-requests: write # for technote-space/create-pr-action to create a PR
+permissions: read-all
 jobs:
   check-versions:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # for technote-space/create-pr-action to push code
+      pull-requests: write # for technote-space/create-pr-action to create a PR
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
         with:
+          persist-credentials: false
           # Fine-grained PAT with contents:write and workflows:write scopes
           token: ${{ secrets.WORKFLOW_TOKEN }}
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # 6.0.0
@@ -42,8 +44,12 @@ jobs:
           PR_TITLE: "chore: update versions"
   check-dockerfile:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # 5.0.0
+        with:
+          persist-credentials: false
       - name: update Dockerfile
         uses: ludeeus/dockerfile-updater@eaf8ea79220d076eb46c127fa9895e3de3e0a512 # 21.01.0
         with:
