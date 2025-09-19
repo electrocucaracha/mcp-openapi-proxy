@@ -31,4 +31,5 @@ fmt: cleanup
 	yamlfmt -dstar **/*.{yaml,yml}
 	command -v prettier > /dev/null || npm install prettier
 	npx prettier . --write
-	tox -e fmt
+	command -v uvx > /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
+	uvx tox -e fmt

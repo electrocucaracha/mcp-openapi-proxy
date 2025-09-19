@@ -69,6 +69,26 @@ sequenceDiagram
 | HOST             | 127.0.0.1       | Hostname or IP address to bind the server to.                |
 | PORT             | 8000            | Port number to listen on.                                    |
 
+## How to setup a development environment
+
+This project includes **Dev Container** support, making it easy to get started with a fully configured development environment. This ensures consistency across development setups and allows contributors to begin working without manual environment configuration.
+
+### Option 1: GitHub Codespaces
+
+You can launch a cloud-based development environment instantly:
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?repo=electrocucaracha/mcp-openapi-proxy)
+
+### Option 2: Local Dev Container (Visual Studio Code)
+
+1. Install [Visual Studio Code](https://code.visualstudio.com/).
+1. Install the [Dev Containers extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers).
+1. Ensure you have a container runtime installed and running:
+   - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/macOS)
+   - [Docker Engine](https://docs.docker.com/engine/install/) or [Podman](https://podman.io/) (Linux)
+1. Open this repository in Visual Studio Code.
+1. When prompted, reopen the project in a Dev Container.
+
 ## Validation
 
 A [helper script](tests/client.py) is provided to validate the MCP server.
